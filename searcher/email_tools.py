@@ -49,5 +49,8 @@ def fetch_all_new_ids_from_inbox(mail):
 	except Exception as exc:
 		print('Unable to fetch the data from the mailbox : {}'.format(exc))	
 
-def save_mails(ids_list):
+def get_mails(ids_list):
+	pass
+
+def save_mail(mail):
 	pass		
