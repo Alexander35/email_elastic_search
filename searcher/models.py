@@ -17,7 +17,8 @@ class Email(models.Model):
 			meta = {'id': self.id},
 			title = self.title,
 			sender = self.sender,
-			date = self.date
+			date = self.date,
+			text = self.text
 		)
 		obj.save()
 

@@ -120,3 +120,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+IMAP4_SSL = 'imap.gmail.com'
+TARGET_MAIL = 'mail_name@gmail.com'
+TARGET_MAIL_PASS = 'password'
