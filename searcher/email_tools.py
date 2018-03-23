@@ -1,56 +1,72 @@
 import imaplib
 import datetime
 from django.conf import settings
-
-def imap_connect():
-
-	try:
-		mail = imaplib.IMAP4_SSL(settings.IMAP4_SSL)
-		mail.login(settings.TARGET_MAIL, settings.TARGET_MAIL_PASS)
-		mail.list()
-		return mail
-	except	Exception as exc:
-		print('unable to connect to the mailbox : {}'.format(exc))
-		return None 
-
-def fetch_all_new_ids_from_inbox(mail):
-
-	if mail == None:
-		return None
-	try:	
-		mail.select("inbox") # connect to inbox.
-
-		result, data = mail.uid('search', None, '(UNSEEN)')
-		print(result , data)
-		 
-		ids = data[0] # data is a list.
-
-		print('ids {}'.format(ids))
-
-		id_list = ids.split() # ids is a space separated string
-
-		print('id_list {}'.format(id_list))
+import email
+from email.header import decode_header
+from .models import Email
+import quopri
 
 
+class EmailTool():
 
-		# latest_email_id = id_list[-1] # get the latest
+	def __init__(self):
+		self.imap_connect()
 
-		# print('lastest_email_id {}'.format(latest_email_id))
+	def fetch_new_and_save(self):
+		ids_list = self.fetch_all_new_ids_from_inbox()
+		emails = self.get_mails(ids_list)
+		savedmails = [ self.save_mail(email) for email in emails ]
+		return savedmails
 
-		# result, data = mail.uid('fetch', latest_email_id, '(RFC822)')
+	def imap_connect(self):
 
-		# print(result , data) 
+		try:
+			self.mail = imaplib.IMAP4_SSL(settings.IMAP4_SSL)
+			self.mail.login(settings.TARGET_MAIL, settings.TARGET_MAIL_PASS)
+			self.mail.list()
+			# return self.mail
+		except	Exception as exc:
+			print('unable to connect to the mailbox : {}'.format(exc))
+			return None 
 
-		# raw_email = data[0][0]
+	def fetch_all_new_ids_from_inbox(self):
 
-		# print(raw_email.decode('utf-8'))	
+		if self.mail == None:
+			return None
+		try:	
+			self.mail.select("inbox") # connect to inbox.
 
-		return id_list
-	except Exception as exc:
-		print('Unable to fetch the data from the mailbox : {}'.format(exc))	
+			result, data = self.mail.uid('search', None, '(UNSEEN)')
+			ids = data[0] # data is a list.
+			id_list = ids.split() # ids is a space separated string
 
-def get_mails(ids_list):
-	pass
+			return id_list
+		except Exception as exc:
+			print('Unable to fetch the data from the mailbox : {}'.format(exc))	
 
-def save_mail(mail):
-	pass		
+	def get_one_mail(self, email_id):
+		_, data = self.mail.uid('fetch', email_id, '(RFC822)')
+		_, mail = data[0]
+		msg = email.message_from_string(mail.decode('utf-8'))
+
+		print(msg['From'])
+
+		return [mail.decode(), msg] 
+
+	def get_mails(self, ids_list):
+		emails = [ self.get_one_mail(email_id) for email_id in ids_list ]
+		# print(emails)
+		return emails
+
+	def save_mail(self, email):
+		[(subj, code)] = decode_header(email[1]['Subject'])
+
+		new_email = Email(
+				title=subj.decode(code),
+				sender=email[1]['From'],
+				date=email[1]['Date'],
+				text= quopri.decodestring(email[0].encode('utf-8')).decode('utf-8')
+			)
+		new_email.save()
+
+		return new_email

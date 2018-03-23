@@ -19,15 +19,14 @@ def main(request):
 @login_required
 def new_mails_list(request):
 
-	mail = imap_connect()
-	ids_list = fetch_all_new_ids_from_inbox(mail)
-	
+	ET = EmailTool()
+	saved_mails = ET.fetch_new_and_save()
 
 	return render(
 		request,
 		'new_mails_list.html',
 		{
-			'title' : 'New Mails List'
-
+			'title' : 'New Mails List',
+			'saved_mails' : saved_mails
 		}
     )    

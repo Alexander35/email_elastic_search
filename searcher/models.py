@@ -6,7 +6,7 @@ from .search import EmailIndex
 class Email(models.Model):
 	title = models.CharField(max_length=200, default=None, blank=True, null=True)
 	sender = models.CharField(max_length=200, default=None, blank=True, null=True)
-	date = models.DateTimeField()
+	date = models.CharField(max_length=200, default=None, blank=True, null=True)
 	text = models.TextField(max_length=1000, default=None, blank=True, null=True)
 
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -23,3 +23,6 @@ class Email(models.Model):
 		obj.save()
 
 		return obj.to_dict(include_meta=True)
+
+	def __str__(self):
+		return '{} | {}'.format(self.title, self.date)		

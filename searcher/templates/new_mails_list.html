@@ -9,7 +9,28 @@
   <hr class="my-4">
 	Search Field 
   <hr class="my-4">
-	LIST 	
+	<div class="table-responsive">
+		<table class="table">
+		  <thead class="thead-light">
+		    <tr>
+		      <th scope="col">Date</th>
+		      <th scope="col">Subject</th>
+		      <th scope="col">Sender</th>
+		      <th scope="col">E-mail</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		  	{% for saved_mail in saved_mails %}
+		    <tr>
+		      <th scope="row">{{ saved_mail.date  }}</th>
+		      <td>{{ saved_mail.title }}</td>
+		      <td>{{ saved_mail.sender }}</td>
+		      <td>{{ saved_mail.text }}</td>
+		    </tr>
+		    {% endfor %}
+		  </tbody>
+		</table>
+	</div>
 </div>
 
 {% endblock %}
