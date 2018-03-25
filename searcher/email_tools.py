@@ -47,7 +47,7 @@ class EmailTool():
 	def get_one_mail(self, email_id):
 		_, data = self.mail.uid('fetch', email_id, '(RFC822)')
 		_, mail = data[0]
-		msg = email.message_from_string(mail.decode('utf-8'))
+		msg = email.message_from_string(mail.decode('utf-8', 'backslashreplace'))
 
 		print(msg['From'])
 
@@ -65,7 +65,7 @@ class EmailTool():
 				title=subj.decode(code),
 				sender=email[1]['From'],
 				date=email[1]['Date'],
-				text= quopri.decodestring(email[0].encode('utf-8')).decode('utf-8')
+				text= quopri.decodestring(email[0].encode('utf-8')).decode('utf-8', 'backslashreplace')
 			)
 		new_email.save()
 
